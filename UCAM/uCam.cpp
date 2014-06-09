@@ -15,7 +15,6 @@ uint8_t _DATAFLAG[]={0xAA, 0x0A, 0x01}; //the next 3 bits are the size to expect
 uint8_t _ACKSYNC[]={0xAA, 0x0E, 0x0D, 0x00, 0x00, 0x00};
 uint8_t _ACKDATA[]={0xAA, 0x0E, 0x0A, 0x00, 0x00, 0x00};
 uint8_t _RESET[]={0xAA, 0x08, 0x00, 0x00, 0x00, 0xFF};
-uint8_t _ERROR;
 
 uCam::uCam()
 {
@@ -26,9 +25,7 @@ uCam::uCam()
 void uCam::begin(HardwareSerial *SerialCam, HardwareSerial *Comms)
 {
 	_Serial = SerialCam;
-	//_Serial->begin(115200);
 	_CommsToPC = Comms;
-	//_CommsToPC->begin(115200);
 }
 
 int uCam::SYNC()
@@ -115,6 +112,11 @@ int uCam::SNAPSHOT()
 
 int uCam::GET()
 {
+  //local vars
+  uint8_t counterArr[3];
+  uint32_t counter;
+
+  
   _Serial->flush();
   _Serial->write(_GETCMD,6);
   while ( _Serial->available() <6) {}
@@ -129,40 +131,27 @@ int uCam::GET()
   _Serial->read(); //6byte
   while (_Serial->available() < 6 ){}
   _Serial->read(); //1 byte DATA
-  _ERROR = _Serial->read();
-  if (_ERROR != 0x0A)
+  if (_Serial->read() != 0x0A)
   {
     return 2;
   }
   _Serial->read(); //DATA type bit
   
-  uint8_t temp = _Serial->read();
-  uint32_t counter = temp; //LSB
-  //Serial.write(temp);
+  counterArr[0] = _Serial->read();  
+  counterArr[1] = _Serial->read();
+  counterArr[2] = _Serial->read();
   
-  temp = _Serial->read();
-  uint32_t byteIn = temp; //BYTE1
-  //Serial.write(temp);
+  counter = counterArr[0]+(counterArr[1]*256)+(counterArr[2]*65536);
+    
+  _CommsToPC->write(counterArr,3);
   
-  counter = counter+(byteIn*256);
-  temp = _Serial->read();
-  byteIn = temp;//MSB
-  //Serial.write(temp);
-  counter = counter+(byteIn*65536);//counter is now the number of bytes that the camera will send.
-  _CommsToPC->println(counter);
-  while (_CommsToPC->available() < 0){}
-  _CommsToPC->read();
   while (counter>0)
   {
-    //Serial.write (_Serial->.read());
     _CommsToPC->write (_Serial->read());
-    //Serial.print (", 0x");
     counter--;
-    //while (Serial.available() < 0){}
   }
   
-  //send ACK that all data has been received
-  
+  //send ACK that all data has been received  
   _Serial->write(_ACKDATA,6);
   return 0;
 }
