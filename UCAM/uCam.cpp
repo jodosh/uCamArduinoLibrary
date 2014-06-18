@@ -61,7 +61,7 @@ int uCam::SYNC()
   _Serial->read(); //last byte of SYNC
   _Serial->flush();
   _Serial->write(_ACKSYNC,6);
-  delay(1000);
+  delay(1500); //per datasheet allow 1-2 seconds after sync before pic is captured
   return 0;
 
 }
@@ -148,8 +148,10 @@ int uCam::GET()
   
   while (counter>0)
   {
-    _CommsToPC->write (_Serial->read());
-    counter--;
+    if (_Serial->available() > 0){
+		_CommsToPC->write (_Serial->read());
+		counter--;
+	}
   }
   
   //send ACK that all data has been received  
