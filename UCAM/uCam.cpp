@@ -28,6 +28,12 @@ void uCam::begin(HardwareSerial *SerialCam, HardwareSerial *Comms)
 	_CommsToPC = Comms;
 }
 
+void uCam::RESET()
+{
+	_Serial->write(_RESET,6);
+	delay(200);
+}
+
 int uCam::SYNC()
 {
 

@@ -12,6 +12,7 @@ class uCam
   public:
     uCam();
 	void begin(HardwareSerial *SerialCam, HardwareSerial *CommsToPC);
+	void RESET();
     int SYNC();
 	int INIT();
 	int SNAPSHOT();
