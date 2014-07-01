@@ -12,33 +12,37 @@ void setup() {
 }
 
 void draw(){
- 
-  println("Press Anykey to take a picture.");
-  println("Already Captured "+loopCounter+" images");
   
-  while ( myPort.available() <3) {
-    delay(1);
-  }
-  setCounter();
-  if (loopCounter < 10)
-  {  
-    getImage("0"+loopCounter+"First.bmp");
-  } else{
-    getImage(loopCounter+"First.bmp");
-  }
+ delay(1500);
+ myPort.write(65); //wite A out of serial port
+  
+  if ( myPort.available() >2) {
+      println("Press Anykey to take a picture."); 
+      println("Already Captured "+loopCounter+" images");
+    //delay(1);
+  
+    setCounter();
+    if (loopCounter < 10)
+    {  
+      getImage("0"+loopCounter+"First.bmp");
+    } else{
+      getImage(loopCounter+"First.bmp");
+    }
   
     while ( myPort.available() <3) {
-    delay(1);
+      delay(1);
+    }
+    setCounter();
+    if (loopCounter < 10)
+    {  
+      getImage("0"+loopCounter+"Second.bmp");
+      loopCounter++;
+    } else{
+      getImage(loopCounter+"Second.bmp");
+      loopCounter++;
+    }
   }
-  setCounter();
-  if (loopCounter < 10)
-  {  
-    getImage("0"+loopCounter+"Second.bmp");
-  } else{
-    getImage(loopCounter+"Second.bmp");
-  }
-  
-  delay(100);
+  //delay(100);
  
 }
 
@@ -76,10 +80,6 @@ void getImage(String fileName){
   img.save(fileName);
   image(img,0,0);
   
-}
-
-void keyPress() {
-  myPort.write(65); //wite A out of serial port
 }
 
 
