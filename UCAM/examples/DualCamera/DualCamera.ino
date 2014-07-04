@@ -26,8 +26,8 @@ void loop()
   delay(5000);
   cam0.SYNC();
   cam1.SYNC();
-  cam0.INIT();
-  cam1.INIT();
+  cam0.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
+  cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
   cam0.SNAPSHOT();
   cam1.SNAPSHOT();
   cam0.GET();

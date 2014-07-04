@@ -60,7 +60,7 @@ boolean setUpCam()
       cam1.RESET();
       return false;
     }
-    cam0.INIT();
-    cam1.INIT();
+    cam0.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
+    cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
     return true;
 }

@@ -26,7 +26,7 @@ void loop()
   } else {
 	digitalWrite(12, HIGH);
   }
-  cam1.INIT();
+  cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
   cam1.SNAPSHOT();
   cam1.GET();
   delay  (100000);

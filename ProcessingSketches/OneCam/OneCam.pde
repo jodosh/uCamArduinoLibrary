@@ -1,59 +1,56 @@
 import processing.serial.*;
 
 Serial myPort;
+int[] inByte = new int[4800]; //4800 pixels in an 80x60 image each pixel is 8-bit
+long counter;
+int[] counterArr = new int[3];
 
 void setup() {
   myPort = new Serial(this, "COM10", 115200);
 }
 
-int GET(){
-  myPort.clear(); //clears the buffer
-  delay(100);
-  while ( myPort.available() <6) {}
-  myPort.read();
-  if (myPort.read() != 14)//(int)14 == 0x0E
-  {
-    return 1;
+void draw() {
+  while ( myPort.available() <3) {
+    delay(1);
   }
-  myPort.read();
-  myPort.read(); //4byte
-  myPort.read(); //5byte
-  myPort.read(); //6byte
-  while (myPort.available() < 6 ){}
-  myPort.read(); //1 byte DATA
-  int ERR = myPort.read();
-  if (ERR != 10)//(int)10 == 0x0A
-  {
-    return 2;
-  }
-  myPort.read(); //DATA type bit
-  long counter = myPort.read(); //LSB
-  long byteIn = myPort.read(); //BYTE1
-  counter = counter+(byteIn*256);
-  byteIn = myPort.read();//MSB
-  counter = counter+(byteIn*65536);//counter is now the number of bytes that the camera will send.
+  setCounter(); 
+   getImage("test.bmp");
+}
+
+
+
+void setCounter(){
+  counterArr[0] = myPort.read();
+  counterArr[1] = myPort.read();
+  counterArr[2] = myPort.read();
   
-  int[] inByte = new int[2399]; //4800 pixels in an 80x60 image each pixel is 4-bit 
+  counter = counterArr[0]+(counterArr[1]*256)+(counterArr[2]*65536);
+}
+
+void getImage(String fileName){
+    
+  
+   
   for (int in=0; in < counter; in++)
   {
-    while (myPort.available() < 0) {} //make sure buffer has data
-    
-    inByte[in] = myPort.read(); //save the int values for the HEX of each pixel
-    
+   if (myPort.available() > 0) {
+     inByte[in] = myPort.read(); //save the int values for the HEX of each pixel
+   }else{
+     in--;
+   }    
   }
   
   
   
   PImage img = createImage(80, 60, RGB);
   img.loadPixels();
+  println("img.pixels.length: "+img.pixels.length);
   for (int i =0; i < img.pixels.length; i++)
   {
-    img.pixels[i] = inByte[i];
+    img.pixels[i] = color(inByte[i],inByte[i],inByte[i]);
   }
   img.updatePixels();
+  img.save(fileName);
+  image(img,0,0);
   
-  //send ACK that all data has been received
-  
-  //Serial1.write(ACKDATA,6);
-  return 0;
 }
