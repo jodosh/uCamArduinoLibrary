@@ -9,14 +9,14 @@ boolean picReq;
 
 void setup() {
   myPort = new Serial(this, "COM9", 115200);
-  picReq = false;
   loopCounter = 0;
+  picReq = false;
   delay(8000);
 }
 
 void draw(){
   
- if (!picReq){
+  if (!picReq){
     myPort.write(65); //wite A out of serial port
     picReq = true;
   }
@@ -24,7 +24,7 @@ void draw(){
   if ( myPort.available() >2) {
       println("Press Anykey to take a picture."); 
       println("Already Captured "+loopCounter+" images");
-    picReq = false;
+      picReq = false;
   
     setCounter();
     if (loopCounter < 10)
@@ -48,7 +48,7 @@ void draw(){
     }
     delay(5000); //give time to move chessboard
   }
-  
+  //delay(100);
  
 }
 
@@ -80,8 +80,7 @@ void getImage(String fileName){
   println("img.pixels.length: "+img.pixels.length);
   for (int i =0; i < img.pixels.length; i++)
   {
-    //img.pixels[i] = color(inByte[i],inByte[i],inByte[i]);
-    img.pixels[i] = color(inByte[i]);
+    img.pixels[i] = color(((inByte[i]&0xE0)>>5)*36,((inByte[i]&0x1C)>>2)*36,((inByte[i]&0x03)*85));
   }
   img.updatePixels();
   img.save(fileName);
