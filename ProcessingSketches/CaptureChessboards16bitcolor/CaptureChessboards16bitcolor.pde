@@ -2,7 +2,7 @@ import processing.serial.*;
 
 Serial myPort;
 int loopCounter;
-int[] inByte = new int[4800]; //4800 pixels in an 80x60 image each pixel is 8-bit
+int[] inByte = new int[9600]; //4800 pixels in an 80x60 image each pixel is 16-bit
 long counter;
 int[] counterArr = new int[3];
 boolean picReq;
@@ -12,7 +12,7 @@ void setup() {
   loopCounter = 0;
   picReq = false;
   delay(8000);
-  colorMode(RGB, 7,7,3);
+  colorMode(RGB, 31,63,31);
 }
 
 void draw(){
@@ -79,9 +79,12 @@ void getImage(String fileName){
   PImage img = createImage(80, 60, RGB);
   img.loadPixels();
   println("img.pixels.length: "+img.pixels.length);
+  int in = 0;
   for (int i =0; i < img.pixels.length; i++)
   {
-    img.pixels[i] = color(((inByte[i]&0xE0)>>5),((inByte[i]&0x1C)>>2),((inByte[i]&0x03)));
+    img.pixels[i] = color(((inByte[in]&0xF8)>>3),(((inByte[in]&0x07)<<3)|((inByte[in+1]&0xE0)>>5)),((inByte[in+1]&0x1F)));
+    
+    in=in+2;
   }
   img.updatePixels();
   img.save(fileName);
