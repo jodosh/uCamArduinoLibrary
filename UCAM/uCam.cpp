@@ -38,6 +38,9 @@ void uCam::RESET()
 
 int uCam::SYNC()
 {
+  //resetting the camera first aids in SYNC when the MCU is reset
+  _Serial->write(_RESET,6);
+  delay(1500);
 
   while (_Serial->available() <6)
   {
