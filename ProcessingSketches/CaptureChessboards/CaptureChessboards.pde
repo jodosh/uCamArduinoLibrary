@@ -29,9 +29,9 @@ void draw(){
     setCounter();
     if (loopCounter < 10)
     {  
-      getImage("0"+loopCounter+"First.bmp");
+      getImage("0"+loopCounter+"Left.bmp");
     } else{
-      getImage(loopCounter+"First.bmp");
+      getImage(loopCounter+"Left.bmp");
     }
   
     while ( myPort.available() <3) {
@@ -40,10 +40,10 @@ void draw(){
     setCounter();
     if (loopCounter < 10)
     {  
-      getImage("0"+loopCounter+"Second.bmp");
+      getImage("0"+loopCounter+"Right.bmp");
       loopCounter++;
     } else{
-      getImage(loopCounter+"Second.bmp");
+      getImage(loopCounter+"Right.bmp");
       loopCounter++;
     }
     delay(5000); //give time to move chessboard
