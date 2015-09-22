@@ -8,6 +8,7 @@
 #include <uCam.h>
 
 uCam cam1;
+boolean camSetUp;
 
 void setup()
 {
@@ -16,19 +17,32 @@ void setup()
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
   cam1.begin(&Serial1, &Serial);
+  camSetUp = false;
+}
+
+boolean setUpCam()
+{
+    if (cam1.SYNC() ==0)
+    {
+      digitalWrite(12,HIGH);
+    } else {;
+      cam1.RESET();
+      return false;
+    }
+    cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
+    return true;
 }
 
 void loop()
 {
-  delay(5000);
-  if (cam1.SYNC() ==0){
-	digitalWrite(13, HIGH);
+  if (!camSetUp)
+  {
+    delay(1);
+    camSetUp = setUpCam();
   } else {
-	digitalWrite(12, HIGH);
+    cam1.SNAPSHOT();
+    cam1.GET();
+    delay  (100000);
+    return;
   }
-  cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
-  cam1.SNAPSHOT();
-  cam1.GET();
-  delay  (100000);
-  return;
 }
