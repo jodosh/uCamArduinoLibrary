@@ -20,29 +20,28 @@ void setup()
   camSetUp = false;
 }
 
+void loop()
+{
+  if (!camSetUp)
+  {
+    camSetUp = setUpCam();
+  }
+  
+  cam1.SNAPSHOT();
+  cam1.GET();
+  delay  (100000);
+  return;
+}
+
 boolean setUpCam()
 {
-    if (cam1.SYNC() ==0)
+  if (cam1.SYNC() == 0)
     {
-      digitalWrite(12,HIGH);
-    } else {;
+      digitalWrite(13,HIGH);  
+    } else {
       cam1.RESET();
       return false;
     }
     cam1.INIT(&UCAM_8BIT_GREY,&UCAM_80X60);
     return true;
-}
-
-void loop()
-{
-  if (!camSetUp)
-  {
-    delay(1);
-    camSetUp = setUpCam();
-  } else {
-    cam1.SNAPSHOT();
-    cam1.GET();
-    delay  (100000);
-    return;
-  }
 }
