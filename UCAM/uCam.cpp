@@ -33,7 +33,7 @@ void uCam::begin(HardwareSerial *SerialCam, HardwareSerial *Comms)
 void uCam::RESET()
 {
 	_Serial->write(_RESET,6);
-	delay(300);
+	delay(1800);
 }
 
 int uCam::SYNC()
