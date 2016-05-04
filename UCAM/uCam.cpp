@@ -165,7 +165,7 @@ int uCam::GET()
     if (_Serial->available() > 0){
 		_CommsToPC->write (_Serial->read());
 		counter--;
-		if (counter%1000==0){
+		if (counter%750==0 && counter >0){
 			delay(1);       //this is a work around to provet buffer overflow when using bluetooth
 		}
 	}
