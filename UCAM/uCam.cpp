@@ -42,11 +42,17 @@ int uCam::SYNC()
   _Serial->write(_RESET,6);
   delay(1500);
 
-  while (_Serial->available() <6)
+  int counter = 60;//per spec sheet this should happen a max of 60 times, it is doesn't exit and try again
+  while (_Serial->available() <6 && counter>0)
   {
 	_Serial->write(_SYNCCMD,6);
-    delay(10);
-  }   
+    counter--;
+  }
+  
+  if (counter<1)
+  {
+      return 1;
+  }
  
   _Serial->read();
   if (_Serial->read() != 0x0E)//check if this is ACK
@@ -72,7 +78,7 @@ int uCam::SYNC()
   _Serial->read(); //last byte of SYNC
   _Serial->flush();
   _Serial->write(_ACKSYNC,6);
-  delay(1500); //per datasheet allow 1-2 seconds after sync before pic is captured
+  delay(2000); //per datasheet allow 1-2 seconds after sync before pic is captured
   return 0;
 
 }
