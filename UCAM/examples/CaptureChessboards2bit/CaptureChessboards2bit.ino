@@ -65,7 +65,7 @@ boolean setUpCam()
       cam1.RESET();
       return false;
     }
-    if (cam0.INIT(&UCAM_2BIT_GREY,&UCAM_80X60) != 0)
+    if (cam0.INIT(&UCAM_2BIT_GREY,&UCAM_160X120) != 0)
     {
         cam0.RESET();
         digitalWrite(13,LOW);
@@ -73,7 +73,7 @@ boolean setUpCam()
         digitalWrite(12,LOW);
         return false;
     }
-    if (cam1.INIT(&UCAM_2BIT_GREY,&UCAM_80X60) != 0)
+    if (cam1.INIT(&UCAM_2BIT_GREY,&UCAM_160X120) != 0)
     {
         cam0.RESET();
         digitalWrite(13,LOW);

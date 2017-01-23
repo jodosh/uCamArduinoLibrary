@@ -18,6 +18,7 @@ uint8_t _ACKSYNC[]={0xAA, 0x0E, 0x0D, 0x00, 0x00, 0x00};
 uint8_t _ACKDATA[]={0xAA, 0x0E, 0x0A, 0x00, 0x00, 0x00};
 uint8_t _RESET[]={0xAA, 0x08, 0x00, 0x00, 0x00, 0xFF};
 
+
 uCam::uCam()
 {
   _Serial = NULL;
@@ -33,28 +34,36 @@ void uCam::begin(HardwareSerial *SerialCam, HardwareSerial *Comms)
 void uCam::RESET()
 {
 	_Serial->write(_RESET,6);
-	delay(1800);
+	//delay(1800);
 }
 
 int uCam::SYNC()
 {
   //resetting the camera first aids in SYNC when the MCU is reset
-  _Serial->write(_RESET,6);
-  delay(1500);
+  //_Serial->write(_RESET,6);
+  //delay(2500);
 
-  int counter = 60;//per spec sheet this should happen a max of 60 times, it is doesn't exit and try again
-  while (_Serial->available() <6 && counter>0)
-  {
-	_Serial->write(_SYNCCMD,6);
-    counter--;
-  }
+  int _DELAYMS=5;
+  boolean GOTDATA=false;
+  int counter = 60;//per spec sheet this should happen a max of 60 times, if it still isn't synce wait 5ms (+1ms per iteration)
+  while (!GOTDATA){
+	  while (_Serial->available() <6 && counter>0 && GOTDATA)
+	  {
+		_Serial->write(_SYNCCMD,6);
+		counter--;
+	  }
+	  
+	  delay(_DELAYMS);
+	  _DELAYMS++;
+	  if (counter<1){
+		  counter=60;
+	  } else {
+		  GOTDATA = true;
+	  }
+  }  
   
-  if (counter<1)
-  {
-      return 1;
-  }
  
-  _Serial->read();
+  _Serial->read();//Will be 0xAA no matter what the command was, don't waste time reading it
   if (_Serial->read() != 0x0E)//check if this is ACK
   {
     return 1;
