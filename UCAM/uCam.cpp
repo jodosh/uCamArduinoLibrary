@@ -46,8 +46,19 @@ int uCam::SYNC()
   int _DELAYMS=5;
   boolean GOTDATA=false;
   int counter = 60;//per spec sheet this should happen a max of 60 times, if it still isn't synce wait 5ms (+1ms per iteration)
+  
+  //Check if If Camera has already ACKed
+  if (_Serial->available()>0){
+	  GOTDATA=true;
+  }
+  
+  while(_Serial->available() > 12) //in case the camera has sent multiple ACK
+  {
+	_Serial->read();
+  }
+  
   while (!GOTDATA){
-	  while (_Serial->available() <6 && counter>0 && GOTDATA)
+	  while (_Serial->available() <6 && counter>0 && !GOTDATA)
 	  {
 		_Serial->write(_SYNCCMD,6);
 		counter--;
@@ -55,7 +66,7 @@ int uCam::SYNC()
 	  
 	  delay(_DELAYMS);
 	  _DELAYMS++;
-	  if (counter<1){
+	  if (_Serial->available()<6){
 		  counter=60;
 	  } else {
 		  GOTDATA = true;
@@ -63,10 +74,15 @@ int uCam::SYNC()
   }  
   
  
-  _Serial->read();//Will be 0xAA no matter what the command was, don't waste time reading it
+  while(_Serial->available > 12) //in case the camera has sent multiple ACK
+  {
+	_Serial->read();
+  }
+  
+  _Serial->read();//First Byte
   if (_Serial->read() != 0x0E)//check if this is ACK
   {
-    return 1;
+	return 1;
   }  
   if (_Serial->read() != 0x0D)//check that the ACK if for SYNC
   {
@@ -87,6 +103,8 @@ int uCam::SYNC()
   _Serial->read(); //last byte of SYNC
   _Serial->flush();
   _Serial->write(_ACKSYNC,6);
+  
+  
   delay(2000); //per datasheet allow 1-2 seconds after sync before pic is captured
   return 0;
 
@@ -94,7 +112,11 @@ int uCam::SYNC()
 
 int uCam::INIT(uint8_t *Color, uint8_t *RawResolution)
 {
-  _Serial->flush();
+  /*
+  while (_Serial->available() > 0){
+	  _Serial->read();
+  }
+  */
   _Serial->write(_INIT,3);
   _Serial->write(Color,1);
   _Serial->write(RawResolution,1);
@@ -120,7 +142,11 @@ int uCam::INIT(uint8_t *Color, uint8_t *RawResolution)
 
 int uCam::SNAPSHOT()
 {
-  _Serial->flush();
+  /*
+  while (_Serial->available() > 0){
+	  _Serial->read();
+  }
+  */
   _Serial->write(_SNAPCMD,6);
   while (_Serial->available() < 6) {}
   
@@ -147,7 +173,9 @@ int uCam::GET()
   uint32_t counter;
 
   
-  _Serial->flush();
+  while (_Serial->available() > 0){
+	  _Serial->read();
+  }
   _Serial->write(_GETCMD,6);
   while ( _Serial->available() <6) {}
   _Serial->read();
